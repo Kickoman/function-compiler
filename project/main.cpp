@@ -8,9 +8,9 @@ int main()
     Function f;
     string raw;
     getline(cin, raw);
-    f.set_function(raw);
+    f = raw;
     double xval;
     cin >> xval;
-    cout << f.run(xval);
+    cout << f(xval);
     return 0;
 }

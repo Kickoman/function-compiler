@@ -13,7 +13,10 @@ public:
     virtual ~Function();
 
     int set_function(std::string const& source);
-    double run(double const& xvalue);
+    double run(double const& xvalue) const;
+
+    Function& operator=(const std::string& source);
+    double operator()(double const& xvalue) const;
 
 protected:
 

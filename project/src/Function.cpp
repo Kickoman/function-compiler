@@ -68,7 +68,7 @@ int Function::priority(char const& c) const
     return 0;
 }
 
-double Function::run(double const& xvalue)
+double Function::run(double const& xvalue) const
 {
     std::stack<Unit> st;
     double result = 0;
@@ -115,6 +115,17 @@ double Function::run(double const& xvalue)
         }
     }
     return result;
+}
+
+Function& Function::operator=(const std::string &source)
+{
+    set_function(source);
+    return *this;
+}
+
+double Function::operator()(const double &xvalue) const
+{
+    return run(xvalue);
 }
 
 
