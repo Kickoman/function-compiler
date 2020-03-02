@@ -15,6 +15,7 @@ int Function::set_function(std::string const& source)
 {
     expression = source;
     m_rpn_expr = convert(simplify(expression));
+    return 0;
 }
 
 std::string Function::simplify(std::string const& source)
