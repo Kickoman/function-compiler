@@ -100,7 +100,8 @@ double Function::run(double const& xvalue)
                     result = pow(val1.value, val2.value);
                     break;
                 case '#':
-                    result = val1.function(val1.value);
+                    result = val1.function(val2.value);
+                    break;
                 default:
                     result = 0;
             }
