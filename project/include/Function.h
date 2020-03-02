@@ -12,11 +12,11 @@ public:
     Function();
     virtual ~Function();
 
-    int set_function(std::string const& source);
-    double run(double const& xvalue) const;
+    int set_function(const std::string& source);
+    double run(double xvalue) const;
 
     Function& operator=(const std::string& source);
-    double operator()(double const& xvalue) const;
+    double operator()(double xvalue) const;
 
 protected:
 
@@ -27,11 +27,11 @@ protected:
     std::string expression;
     RPN m_rpn_expr;
 
-    static bool is_operator(char const& c);
-    int priority(char const& c) const;
+    static bool is_operator(char c);
+    int priority(char c) const;
 
-    RPN convert(std::string const& source);
-    std::string simplify(std::string const& source);
+    RPN convert(const std::string& source);
+    std::string simplify(const std::string& source);
 private:
 };
 
@@ -46,8 +46,8 @@ struct Function::Unit
     char operation;
 
     Unit() {}
-    Unit(double const& x) : value(x), type(NUMBER) {}
-    Unit(std::string const& s) {
+    Unit(double x) : value(x), type(NUMBER) {}
+    Unit(const std::string& s) {
         if (s == "x") {
             type = VARIABLE;
         } else {
@@ -60,7 +60,7 @@ struct Function::Unit
                 function = tan;
         }
     }
-    Unit(char const& c) {
+    Unit(char c) {
         type = OPERATOR;
         if (Function::is_operator(c))
             operation = c;

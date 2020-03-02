@@ -11,14 +11,14 @@ Function::~Function()
     //dtor
 }
 
-int Function::set_function(std::string const& source)
+int Function::set_function(const std::string& source)
 {
     expression = source;
     m_rpn_expr = convert(simplify(expression));
     return 0;
 }
 
-std::string Function::simplify(std::string const& source)
+std::string Function::simplify(const std::string& source)
 {
     std::string result = "";
 
@@ -43,7 +43,7 @@ std::string Function::simplify(std::string const& source)
     return result;
 }
 
-bool Function::is_operator(char const& c)
+bool Function::is_operator(char c)
 {
     return (
         c == '*' || c == '/' ||
@@ -53,7 +53,7 @@ bool Function::is_operator(char const& c)
     );
 }
 
-int Function::priority(char const& c) const
+int Function::priority(char c) const
 {
     if (c == '#')
         return 5;
@@ -68,7 +68,7 @@ int Function::priority(char const& c) const
     return 0;
 }
 
-double Function::run(double const& xvalue) const
+double Function::run(double xvalue) const
 {
     std::stack<Unit> st;
     double result = 0;
@@ -123,13 +123,13 @@ Function& Function::operator=(const std::string &source)
     return *this;
 }
 
-double Function::operator()(const double &xvalue) const
+double Function::operator()(double xvalue) const
 {
     return run(xvalue);
 }
 
 
-Function::RPN Function::convert(std::string const& s)
+Function::RPN Function::convert(const std::string& s)
 {
     std::stack<Unit> st;
     Function::RPN result;
