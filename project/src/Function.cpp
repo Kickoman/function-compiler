@@ -135,7 +135,7 @@ Function::RPN Function::convert(const std::string& s)
     Function::RPN result;
 
     std::string buffer = "";
-    for (int i = 0; i < s.size(); ++i)
+    for (size_t i = 0; i < s.size(); ++i)
     {
 
         if (s[i] == '(') {
@@ -160,8 +160,10 @@ Function::RPN Function::convert(const std::string& s)
             }
 
             while (!st.empty() && st.top().operation != '(')
-                result.push_back(st.top()),
+            {
+                result.push_back(st.top());
                 st.pop();
+            }
             if (!st.empty() && st.top().operation == '(') st.pop();
             continue;
         }
@@ -182,8 +184,10 @@ Function::RPN Function::convert(const std::string& s)
                 }
             }
             while (!st.empty() && priority(st.top().operation) >= priority(s[i]))
-                result.push_back(st.top()),
+            {
+                result.push_back(st.top());
                 st.pop();
+            }
             st.push(s[i]);
 
             buffer = "";
@@ -205,6 +209,10 @@ Function::RPN Function::convert(const std::string& s)
             result.push_back(tmp);
         }
     }
-    while (!st.empty()) result.push_back(st.top()), st.pop();
+    while (!st.empty())
+    {
+        result.push_back(st.top());
+        st.pop();
+    }
     return result;
 }

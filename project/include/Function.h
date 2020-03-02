@@ -46,7 +46,7 @@ struct Function::Unit
     char operation;
 
     Unit() {}
-    Unit(double x) : value(x), type(NUMBER) {}
+    Unit(double x) : type(NUMBER), value(x) {}
     Unit(const std::string& s) {
         if (s == "x") {
             type = VARIABLE;
