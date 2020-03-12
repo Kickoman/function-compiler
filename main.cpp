@@ -1,11 +1,11 @@
 #include <iostream>
-#include "Function.h"
+#include "kfunction.h"
 
 using namespace std;
 
 int main()
 {
-    Function f;
+    Function<double> f;
     string raw;
     getline(cin, raw);
     f = raw;

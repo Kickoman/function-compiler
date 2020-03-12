@@ -1,24 +1,103 @@
-#include "Function.h"
+#ifndef FUNCTION_COMPILER_H
+#define FUNCTION_COMPILER_H
+#include <string>
+#include <vector>
+#include <math.h>
 #include <stack>
 
-Function::Function()
+enum UnitType{NUMBER, VARIABLE, FUNCTION, OPERATOR, UNDEFINED};
+
+template<class T>
+class Function
+{
+public:
+    Function();
+    virtual ~Function();
+
+    int set_function(const std::string& source);
+    T run(T xvalue) const;
+
+    Function& operator=(const std::string& source);
+    T operator()(T xvalue) const;
+
+protected:
+
+    struct Unit;
+    typedef std::vector<Unit> RPN;
+
+
+    std::string expression;
+    RPN m_rpn_expr;
+
+    static bool is_operator(char c);
+    int priority(char c) const;
+
+    RPN convert(const std::string& source);
+    std::string simplify(const std::string& source);
+private:
+};
+
+template<class T>
+struct Function<T>::Unit
+{
+    typedef T (*_Function)(T);
+
+    UnitType type;
+    T value;
+    _Function function;
+    char operation;
+
+    Unit() = default;
+    explicit Unit(T x) : type(NUMBER), value(x) {}
+    explicit Unit(const std::string& s) {
+        if (s == "x") {
+            type = VARIABLE;
+        } else {
+            type = FUNCTION;
+            if (s == "sin")
+                function = sin;
+            else if (s == "cos")
+                function = cos;
+            else
+                function = tan;
+        }
+    }
+    explicit Unit(char c) {
+        type = OPERATOR;
+        if (Function<T>::is_operator(c))
+            operation = c;
+        else
+            operation = '*';
+    }
+};
+
+
+
+
+
+
+template<class T>
+Function<T>::Function()
 {
     //ctor
 }
 
-Function::~Function()
+template<class T>
+Function<T>::~Function()
 {
     //dtor
 }
 
-int Function::set_function(const std::string& source)
+template<class T>
+int Function<T>::set_function(const std::string& source)
 {
     expression = source;
     m_rpn_expr = convert(simplify(expression));
     return 0;
 }
 
-std::string Function::simplify(const std::string& source)
+template<class T>
+std::string Function<T>::simplify(const std::string& source)
 {
     std::string result = "";
 
@@ -43,17 +122,19 @@ std::string Function::simplify(const std::string& source)
     return result;
 }
 
-bool Function::is_operator(char c)
+template<class T>
+bool Function<T>::is_operator(char c)
 {
     return (
         c == '*' || c == '/' ||
         c == '+' || c == '-' ||
         c == '^' || c == '#' ||
         c == '(' || c == ')'
-    );
+        );
 }
 
-int Function::priority(char c) const
+template<class T>
+int Function<T>::priority(char c) const
 {
     if (c == '#')
         return 5;
@@ -68,7 +149,8 @@ int Function::priority(char c) const
     return 0;
 }
 
-double Function::run(double xvalue) const
+template<class T>
+T Function<T>::run(T xvalue) const
 {
     std::stack<Unit> st;
     double result = 0;
@@ -84,26 +166,26 @@ double Function::run(double xvalue) const
 
             switch (cur.operation)
             {
-                case '+':
-                    result = val1.value + val2.value;
-                    break;
-                case '-':
-                    result = val1.value - val2.value;
-                    break;
-                case '*':
-                    result = val1.value * val2.value;
-                    break;
-                case '/':
-                    result = val1.value / val2.value;
-                    break;
-                case '^':
-                    result = pow(val1.value, val2.value);
-                    break;
-                case '#':
-                    result = val1.function(val2.value);
-                    break;
-                default:
-                    result = 0;
+            case '+':
+                result = val1.value + val2.value;
+                break;
+            case '-':
+                result = val1.value - val2.value;
+                break;
+            case '*':
+                result = val1.value * val2.value;
+                break;
+            case '/':
+                result = val1.value / val2.value;
+                break;
+            case '^':
+                result = pow(val1.value, val2.value);
+                break;
+            case '#':
+                result = val1.function(val2.value);
+                break;
+            default:
+                result = 0;
             }
 
             st.push(Unit(result));
@@ -117,22 +199,25 @@ double Function::run(double xvalue) const
     return result;
 }
 
-Function& Function::operator=(const std::string &source)
+template<class T>
+Function<T>& Function<T>::operator=(const std::string &source)
 {
     set_function(source);
     return *this;
 }
 
-double Function::operator()(double xvalue) const
+template<class T>
+T Function<T>::operator()(T xvalue) const
 {
     return run(xvalue);
 }
 
 
-Function::RPN Function::convert(const std::string& s)
+template<class T>
+typename Function<T>::RPN Function<T>::convert(const std::string& s)
 {
     std::stack<Unit> st;
-    Function::RPN result;
+    Function<T>::RPN result;
 
     std::string buffer = "";
     for (size_t i = 0; i < s.size(); ++i)
@@ -188,7 +273,7 @@ Function::RPN Function::convert(const std::string& s)
                 result.push_back(st.top());
                 st.pop();
             }
-            st.push(s[i]);
+            st.push(Unit(s[i]));
 
             buffer = "";
         } else {
@@ -216,3 +301,6 @@ Function::RPN Function::convert(const std::string& s)
     }
     return result;
 }
+
+
+#endif // FUNCTION_COMPILER_H
