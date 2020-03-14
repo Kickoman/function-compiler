@@ -12,6 +12,7 @@ class Function
 {
 public:
     Function();
+    Function(const std::string& source);
     virtual ~Function();
 
     int set_function(const std::string& source);
@@ -80,6 +81,12 @@ template<class T>
 Function<T>::Function()
 {
     //ctor
+}
+
+template<class T>
+Function<T>::Function(const std::string &source)
+{
+    set_function(source);
 }
 
 template<class T>
