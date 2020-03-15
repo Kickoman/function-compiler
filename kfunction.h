@@ -7,6 +7,16 @@
 
 enum UnitType{NUMBER, VARIABLE, FUNCTION, OPERATOR, UNDEFINED};
 
+namespace {
+
+template<typename T>
+double sgn(T val)
+{
+    return (T(0) < val) - (val < T(0));
+}
+
+}
+
 template<class T>
 class Function
 {
@@ -51,14 +61,22 @@ struct Function<T>::Unit
     Unit() = default;
     explicit Unit(T x) : type(NUMBER), value(x) {}
     explicit Unit(const std::string& s) {
-        if (s == "x") {
+        if (s.compare("x") == 0) {
             type = VARIABLE;
         } else {
             type = FUNCTION;
-            if (s == "sin")
+            if (s.compare("sin") == 0)
                 function = sin;
-            else if (s == "cos")
+            else if (s.compare("cos") == 0)
                 function = cos;
+            else if (s.compare("asin") == 0)
+                function = asin;
+            else if (s.compare("acos") == 0)
+                function = acos;
+            else if (s.compare("sgn") == 0)
+                function = sgn;
+            else if (s.compare("floor") == 0)
+                function = floor;
             else
                 function = tan;
         }
@@ -133,7 +151,7 @@ template<class T>
 bool Function<T>::is_operator(char c)
 {
     return (
-        c == '*' || c == '/' ||
+        c == '*' || c == '/' || c == '%' ||
         c == '+' || c == '-' ||
         c == '^' || c == '#' ||
         c == '(' || c == ')'
@@ -147,7 +165,7 @@ int Function<T>::priority(char c) const
         return 5;
     if (c == '^')
         return 4;
-    if (c == '*' || c == '/')
+    if (c == '*' || c == '/' || c == '%')
         return 3;
     if (c == '+' || c == '-')
         return 2;
@@ -184,6 +202,10 @@ T Function<T>::run(T xvalue) const
                 break;
             case '/':
                 result = val1.value / val2.value;
+                break;
+            case '%':
+                result = static_cast<long long>(val1.value) %
+                         static_cast<long long>(val2.value);
                 break;
             case '^':
                 result = pow(val1.value, val2.value);
