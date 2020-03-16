@@ -10,7 +10,7 @@ enum UnitType{NUMBER, VARIABLE, FUNCTION, OPERATOR, UNDEFINED};
 namespace {
 
 template<typename T>
-double sgn(T val)
+T sgn(T val)
 {
     return (T(0) < val) - (val < T(0));
 }
@@ -59,7 +59,7 @@ struct Function<T>::Unit
     char operation;
 
     Unit() = default;
-    explicit Unit(T x) : type(NUMBER), value(x) {}
+    explicit Unit(const T& x) : type(NUMBER), value(x) {}
     explicit Unit(const std::string& s) {
         if (s.compare("x") == 0) {
             type = VARIABLE;
@@ -178,7 +178,7 @@ template<class T>
 T Function<T>::run(T xvalue) const
 {
     std::stack<Unit> st;
-    double result = 0;
+    T result = 0;
 
     for (size_t i = 0; i < m_rpn_expr.size(); ++i)
     {
@@ -261,7 +261,7 @@ typename Function<T>::RPN Function<T>::convert(const std::string& s)
                 if (isdigit(buffer[0])) {
                     // that's number
                     char *kek;
-                    Unit tmp(strtod(buffer.c_str(), &kek));
+                    Unit tmp(T(strtod(buffer.c_str(), &kek)));
                     result.push_back(tmp);
                 } else if (buffer == "x") {
                     Unit tmp("x");
@@ -287,7 +287,7 @@ typename Function<T>::RPN Function<T>::convert(const std::string& s)
                 if (isdigit(buffer[0])) {
                     // that's number
                     char *kek;
-                    Unit tmp(strtod(buffer.c_str(), &kek));
+                    Unit tmp(T(strtod(buffer.c_str(), &kek)));
                     result.push_back(tmp);
                 } else if (buffer == "x") {
                     Unit tmp("x");
@@ -313,7 +313,7 @@ typename Function<T>::RPN Function<T>::convert(const std::string& s)
         if (isdigit(buffer[0])) {
             // that's number
             char *kek;
-            Unit tmp(strtod(buffer.c_str(), &kek));
+            Unit tmp(T(strtod(buffer.c_str(), &kek)));
             result.push_back(tmp);
         } else if (buffer == "x") {
             Unit tmp("x");
