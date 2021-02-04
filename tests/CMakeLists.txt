@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-#test commit
+
 project(kfunction_tests)
 
 set(gtest_disable_pthreads OFF "" FORCE)
