@@ -17,3 +17,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${K_FUNCTION_INCLUDE_DIR}
 )
 target_link_libraries(${PROJECT_NAME} ${GTEST_BOTH_LIBRARIES} gtest)
+
+add_test(
+    NAME
+    ${PROJECT_NAME}
+    COMMAND
+    ${PROJECT_NAME}
+)
