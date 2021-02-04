@@ -51,7 +51,7 @@ private:
 template<class T>
 struct Function<T>::Unit
 {
-    typedef T (*_Function)(T);
+    typedef double (*_Function)(double);
 
     UnitType type;
     T value;
