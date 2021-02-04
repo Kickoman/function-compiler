@@ -3,8 +3,12 @@ cmake_minimum_required(VERSION 3.0)
 project(kfunction_tests)
 
 set(gtest_disable_pthreads OFF "" FORCE)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 add_subdirectory(gtest)
-include_directories(${gtest_SOURCE_DIR}/include ${K_FUNCTION_INCLUDE_DIR})
+include_directories(
+    ${gtest_SOURCE_DIR}/include 
+    ${K_FUNCTION_INCLUDE_DIR}
+)
 
 set(SOURCES
     main.cpp
