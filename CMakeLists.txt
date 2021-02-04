@@ -1,16 +1,11 @@
-cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.0)
 
-project(FunCompiler VERSION 0.1.0 LANGUAGES CXX)
+project(funCompiler)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+option(BUILD_TESTS "Build unit tests" ON)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-
-add_executable(FunCompiler 
-    main.cpp
-    kfunction.h
-)
-
+add_subdirectory(kfunction)
+if (BUILD_TESTS)
+	enable_testing()
+	add_subdirectory(tests)
+endif()

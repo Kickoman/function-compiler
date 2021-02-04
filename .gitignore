@@ -50,3 +50,4 @@ obj/
 build*/
 *.txt.user*
 *.user*
+.vscode/
