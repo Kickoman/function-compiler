@@ -130,6 +130,8 @@ std::string Function<T>::simplify(const std::string& source)
 
     for (size_t i = 0; i < source.size(); ++i)
     {
+        if (isspace(source[i])) continue;
+
         if (is_operator(source[i]))
             if (i == 0 || source[i - 1] == '(')
             {
