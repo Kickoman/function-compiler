@@ -3,6 +3,7 @@
 
 #include "gtest/gtest.h"
 #include "kfunction.h"
+#include <limits.h>
 
 TEST(TestOperations, add_float)
 {
