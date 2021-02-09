@@ -1,6 +1,5 @@
-#include "test_types.h"
-#include "test_functions.h"
-#include "tst_operations.h"
+#include "testfunction.h"
+#include "test_classes.h"
 
 int main(int argc, char *argv[])
 {
