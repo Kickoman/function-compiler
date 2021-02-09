@@ -77,6 +77,8 @@ struct Function<T>::Unit
                 function = sgn;
             else if (s.compare("floor") == 0)
                 function = floor;
+            else if (s.compare("exp") == 0)
+                function = exp;
             else if (s.compare("log10") == 0)
                 function = log10;
             else
