@@ -144,7 +144,7 @@ std::string Function<T>::simplify(const std::string& source)
         if (!isalpha(source[i]) || source[i] == 'x') { continue; }
 
         size_t j;
-        for (j = i + 1; j < source.size() && isalpha(source[j]); ++j)
+        for (j = i + 1; j < source.size() && (isalpha(source[j]) || isdigit(source[j])); ++j)
             result += source[j];
         result += '#';
         i = j - 1;
