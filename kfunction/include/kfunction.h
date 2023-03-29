@@ -2,16 +2,27 @@
 #define FUNCTION_COMPILER_H
 #include <string>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <stack>
+#include <limits>
+#include <stdexcept>
 
-enum UnitType{NUMBER, VARIABLE, FUNCTION, OPERATOR, UNDEFINED};
+enum UnitType{
+    NUMBER,
+    VARIABLE,
+    FUNCTION,
+    OPERATOR,
+    UNDEFINED __attribute__((unused))
+};
 
 namespace {
 
 template<typename T>
 T sgn(T val)
 {
+    static_assert(std::is_arithmetic<T>::value, "T must be an arithmetic type");
+    if (std::isnan(val))
+        return std::numeric_limits<T>::quiet_NaN();
     return (T(0) < val) - (val < T(0));
 }
 
@@ -21,9 +32,9 @@ template<class T>
 class Function
 {
 public:
-    Function();
-    Function(const std::string& source);
-    virtual ~Function();
+    Function() = default;
+    explicit Function(const std::string& source);
+    virtual ~Function() = default;
 
     int set_function(const std::string& source);
     T run(T xvalue) const;
@@ -51,38 +62,40 @@ private:
 template<class T>
 struct Function<T>::Unit
 {
-    typedef double (*_Function)(double);
+    typedef double (*TFunction)(double);
 
-    UnitType type;
+    UnitType type{UNDEFINED};
     T value;
-    _Function function;
-    char operation;
+    TFunction function{};
+    char operation{};
 
     Unit() = default;
     explicit Unit(const T& x) : type(NUMBER), value(x) {}
     explicit Unit(const std::string& s) {
-        if (s.compare("x") == 0) {
+        if (s == "x") {
             type = VARIABLE;
         } else {
             type = FUNCTION;
-            if (s.compare("sin") == 0)
+            if (s == "sin")
                 function = sin;
-            else if (s.compare("cos") == 0)
+            else if (s == "cos")
                 function = cos;
-            else if (s.compare("asin") == 0)
+            else if (s == "tan")
+                function = tan;
+            else if (s == "asin")
                 function = asin;
-            else if (s.compare("acos") == 0)
+            else if (s == "acos")
                 function = acos;
-            else if (s.compare("sgn") == 0)
+            else if (s == "sgn")
                 function = sgn;
-            else if (s.compare("floor") == 0)
+            else if (s == "floor")
                 function = floor;
-            else if (s.compare("exp") == 0)
+            else if (s == "exp")
                 function = exp;
-            else if (s.compare("log10") == 0)
+            else if (s == "log10")
                 function = log10;
             else
-                function = tan;
+                throw std::invalid_argument("Invalid function name: " + s);
         }
     }
     explicit Unit(char c) {
@@ -95,26 +108,10 @@ struct Function<T>::Unit
 };
 
 
-
-
-
-
-template<class T>
-Function<T>::Function()
-{
-    //ctor
-}
-
 template<class T>
 Function<T>::Function(const std::string &source)
 {
     set_function(source);
-}
-
-template<class T>
-Function<T>::~Function()
-{
-    //dtor
 }
 
 template<class T>
@@ -128,7 +125,7 @@ int Function<T>::set_function(const std::string& source)
 template<class T>
 std::string Function<T>::simplify(const std::string& source)
 {
-    std::string result = "";
+    std::string result;
 
     for (size_t i = 0; i < source.size(); ++i)
     {
@@ -136,9 +133,7 @@ std::string Function<T>::simplify(const std::string& source)
 
         if (is_operator(source[i]) && source[i] != '(' && source[i] != ')')
             if (i == 0 || source[i - 1] == '(')
-            {
                 result += '0';
-            }
 
         result += source[i];
         if (!isalpha(source[i]) || source[i] == 'x') { continue; }
@@ -253,82 +248,57 @@ typename Function<T>::RPN Function<T>::convert(const std::string& s)
 {
     std::stack<Unit> st;
     Function<T>::RPN result;
+    std::string buffer;
 
-    std::string buffer = "";
-    for (size_t i = 0; i < s.size(); ++i)
+    const auto processBuffer = [&result](std::string &buffer) -> void
     {
+        if (!buffer.empty()) {
+            if (isdigit(buffer[0]))
+                result.push_back(Unit(T(std::stod(buffer))));
+            else if (buffer == "x")
+                result.push_back(Unit("x"));
+            else
+                result.push_back(Unit(buffer));
+            buffer.clear();
+        }
+    };
 
-        if (s[i] == '(') {
-            st.push(Unit((char('('))));
+    for (char c : s)
+    {
+        if (c == '(') {
+            st.push(Unit('('));
             continue;
         }
-        if (s[i] == ')') {
-            if (buffer != "") {
-                if (isdigit(buffer[0])) {
-                    // that's number
-                    char *kek;
-                    Unit tmp(T(strtod(buffer.c_str(), &kek)));
-                    result.push_back(tmp);
-                } else if (buffer == "x") {
-                    Unit tmp("x");
-                    result.push_back(tmp);
-                } else {
-                    Unit tmp(buffer);
-                    result.push_back(tmp);
-                }
-                buffer = "";
-            }
 
+        if (c == ')') {
+            processBuffer(buffer);
             while (!st.empty() && st.top().operation != '(')
             {
                 result.push_back(st.top());
                 st.pop();
             }
-            if (!st.empty() && st.top().operation == '(') st.pop();
+
+            if (!st.empty() && st.top().operation == '(')
+                st.pop();
+
             continue;
         }
-        if (is_operator(s[i])) {
-            if (buffer != "") {
 
-                if (isdigit(buffer[0])) {
-                    // that's number
-                    char *kek;
-                    Unit tmp(T(strtod(buffer.c_str(), &kek)));
-                    result.push_back(tmp);
-                } else if (buffer == "x") {
-                    Unit tmp("x");
-                    result.push_back(tmp);
-                } else {
-                    Unit tmp(buffer);
-                    result.push_back(tmp);
-                }
-            }
-            while (!st.empty() && priority(st.top().operation) >= priority(s[i]))
+        if (is_operator(c)) {
+            processBuffer(buffer);
+            while (!st.empty() && priority(st.top().operation) >= priority(c))
             {
                 result.push_back(st.top());
                 st.pop();
             }
-            st.push(Unit(s[i]));
+            st.push(Unit(c));
+            buffer.clear();
+        } else {
+            buffer += c;
+        }
+    }
 
-            buffer = "";
-        } else {
-            buffer += s[i];
-        }
-    }
-    if (buffer != "") {
-        if (isdigit(buffer[0])) {
-            // that's number
-            char *kek;
-            Unit tmp(T(strtod(buffer.c_str(), &kek)));
-            result.push_back(tmp);
-        } else if (buffer == "x") {
-            Unit tmp("x");
-            result.push_back(tmp);
-        } else {
-            Unit tmp(buffer);
-            result.push_back(tmp);
-        }
-    }
+    processBuffer(buffer);
     while (!st.empty())
     {
         result.push_back(st.top());
