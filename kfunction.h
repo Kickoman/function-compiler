@@ -12,7 +12,7 @@ enum UnitType{
     VARIABLE,
     FUNCTION,
     OPERATOR,
-    UNDEFINED __attribute__((unused))
+    UNDEFINED
 };
 
 namespace {
