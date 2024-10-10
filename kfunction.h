@@ -187,8 +187,22 @@ T Function<T>::run(T xvalue) const
 
         if (cur.type == OPERATOR)
         {
+            if (st.size() < 2) {
+                throw std::runtime_error("Ill-formed function");
+            }
+
             Unit val2 = st.top(); st.pop();
             Unit val1 = st.top(); st.pop();
+
+            if (cur.operation == '#') {
+                if (val1.type != FUNCTION || val2.type != NUMBER) {
+                    throw std::runtime_error("Ill-formed function");
+                }
+            } else {
+                if (val1.type != NUMBER || val2.type != NUMBER) {
+                    throw std::runtime_error("Ill-formed function");
+                }
+            }
 
             switch (cur.operation)
             {
